@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { getBirdeyeClient } from '@/lib/birdeye/client';
 import { scoreCalculator, TokenSecurity } from '@/lib/security/score';
+import { sendTelegramAlert } from '@/lib/alerts/telegram';
 
 export async function GET() {
   try {
@@ -50,6 +51,17 @@ export async function GET() {
           creatorBalance: securityData.creatorBalance,
           calculatedScore: securityScore
         });
+
+        // Send Telegram alert for high-scoring tokens
+        if (securityScore >= 80) {
+          await sendTelegramAlert({
+            symbol: token.symbol,
+            name: token.name,
+            score: securityScore,
+            liquidity: token.liquidity,
+            address: token.address
+          });
+        }
         
         // Create enriched token object
         const enrichedToken = {

@@ -3,11 +3,15 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X as TwitterIcon, Globe } from 'lucide-react';
+import { X as TwitterIcon, Globe, Shield } from 'lucide-react';
 import { useTokens } from '@/hooks/useTokens';
+import { useAlphaAlert } from '@/hooks/useAlphaAlert';
 
 export default function Home() {
   const { data: tokens = [], isLoading, error, refetch } = useTokens();
+  
+  // Alpha Alert system for high-scoring tokens
+  useAlphaAlert(tokens);
 
   const formatLiquidity = (liquidity: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -133,9 +137,17 @@ export default function Home() {
                         {formatLiquidity(token.liquidity)}
                       </TableCell>
                       <TableCell>
-                        <Badge className={`${getSecurityScoreColor(token.securityScore)} text-white`}>
-                          {token.securityScore}/100
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {token.securityScore >= 80 && (
+                            <Badge className="bg-green-600 text-white flex items-center gap-1">
+                              <Shield className="w-3 h-3" />
+                              Safe
+                            </Badge>
+                          )}
+                          <Badge className={`${getSecurityScoreColor(token.securityScore)} text-white`}>
+                            {token.securityScore}/100
+                          </Badge>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
