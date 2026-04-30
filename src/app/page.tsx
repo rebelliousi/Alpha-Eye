@@ -3,7 +3,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, X as TwitterIcon, Globe } from 'lucide-react';
+import { X as TwitterIcon, Globe } from 'lucide-react';
 import { useTokens } from '@/hooks/useTokens';
 
 export default function Home() {
@@ -105,10 +105,13 @@ export default function Home() {
                 </TableHeader>
                 <TableBody>
                   {tokens.map((token, index) => (
-                    <TableRow key={`${token.address}-${index}`} className="border-gray-700">
+                    <TableRow 
+                      key={`${token.address}-${index}`} 
+                      className={`border-gray-700 ${token.securityScore >= 80 ? 'shadow-lg shadow-green-500/20' : ''}`}
+                    >
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
-                          {token.logo && (
+                          {token.logo ? (
                             <img 
                               src={token.logo} 
                               alt={token.name}
@@ -117,6 +120,10 @@ export default function Home() {
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
                             />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                              {token.name.charAt(0).toUpperCase()}
+                            </div>
                           )}
                           <span>{token.name}</span>
                         </div>

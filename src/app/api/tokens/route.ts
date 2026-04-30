@@ -43,6 +43,14 @@ export async function GET() {
         
         const securityScore = scoreCalculator.calculateSecurityScore(security);
         
+        console.log(`Security data for ${token.symbol}:`, {
+          top10HolderPercent: securityData.top10HolderPercent,
+          mutableMetadata: securityData.mutableMetadata,
+          jupStrictList: securityData.jupStrictList,
+          creatorBalance: securityData.creatorBalance,
+          calculatedScore: securityScore
+        });
+        
         // Create enriched token object
         const enrichedToken = {
           name: token.name,
