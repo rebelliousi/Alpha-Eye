@@ -1,11 +1,86 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { getBirdeyeClient } from '@/lib/birdeye/client';
+import { scoreCalculator, TokenSecurity } from '@/lib/security/score';
 
 export async function GET() {
-  const response = await axios.get('https://public-api.birdeye.so/defi/v2/tokens/new_listing?limit=20&meme_platform_enabled=true', {
-    headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY, 'x-chain': 'solana' },
-    proxy: false
-  });
-  console.log("FULL_RAW_RESPONSE:", JSON.stringify(response.data, null, 2));
-  return NextResponse.json(response.data.data.items);
+  try {
+    console.log("Starting API enrichment process...");
+    
+    // Step 1: Get new listings
+    const listingsResponse = await axios.get('https://public-api.birdeye.so/defi/v2/tokens/new_listing?limit=10&meme_platform_enabled=true', {
+      headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY, 'x-chain': 'solana' },
+      proxy: false
+    });
+    
+    const listings = listingsResponse.data.data.items;
+    console.log(`Fetched ${listings.length} new listings`);
+    
+    // Step 2: Sequential enrichment with rate limiting
+    const client = getBirdeyeClient();
+    const enrichedTokens = [];
+    
+    for (let i = 0; i < listings.length; i++) {
+      const token = listings[i];
+      console.log(`Processing token ${i + 1}/${listings.length}: ${token.symbol}`);
+      
+      try {
+        // Get security data
+        const securityResponse = await client.request(`/defi/token_security?address=${token.address}`);
+        const securityData = (securityResponse as any).data?.data || {};
+        
+        // Get metadata data
+        const metadataResponse = await client.request(`/defi/v3/token/meta-data/single?address=${token.address}`);
+        const metadataData = (metadataResponse as any).data?.data || {};
+        
+        // Calculate security score
+        const security: TokenSecurity = {
+          top10HolderPercent: securityData.top10HolderPercent || 100,
+          mutableMetadata: securityData.mutableMetadata || true,
+          jupStrictList: securityData.jupStrictList || false,
+          creatorBalance: securityData.creatorBalance || 100
+        };
+        
+        const securityScore = scoreCalculator.calculateSecurityScore(security);
+        
+        // Create enriched token object
+        const enrichedToken = {
+          name: token.name,
+          symbol: token.symbol,
+          address: token.address,
+          liquidity: token.liquidity,
+          logo: metadataData.logoUri || token.logoURI,
+          securityScore,
+          twitter: metadataData.extensions?.twitter || '',
+          website: metadataData.extensions?.website || '',
+          telegram: metadataData.extensions?.telegram || ''
+        };
+        
+        enrichedTokens.push(enrichedToken);
+        console.log(`✅ Enriched ${token.symbol} with score ${securityScore}`);
+        
+      } catch (error) {
+        console.error(`❌ Failed to enrich ${token.symbol}:`, error);
+        // Add basic token data without enrichment
+        enrichedTokens.push({
+          name: token.name,
+          symbol: token.symbol,
+          address: token.address,
+          liquidity: token.liquidity,
+          logo: token.logoURI,
+          securityScore: 0,
+          twitter: '',
+          website: '',
+          telegram: ''
+        });
+      }
+    }
+    
+    console.log(`Successfully enriched ${enrichedTokens.length} tokens`);
+    return NextResponse.json(enrichedTokens);
+    
+  } catch (error) {
+    console.error("API enrichment failed:", error);
+    return NextResponse.json({ error: "Failed to enrich token data" }, { status: 500 });
+  }
 }

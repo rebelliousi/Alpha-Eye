@@ -7,7 +7,40 @@ export interface ScoreHistory {
   riskLevel: 'low' | 'medium' | 'high';
 }
 
+export interface TokenSecurity {
+  top10HolderPercent: number;
+  mutableMetadata: boolean;
+  jupStrictList: boolean;
+  creatorBalance: number;
+}
+
 export class ScoreCalculator {
+  calculateSecurityScore(security: TokenSecurity): number {
+    let score = 0;
+    
+    // top10HolderPercent < 30% => +40 puan
+    if (security.top10HolderPercent < 30) {
+      score += 40;
+    }
+    
+    // mutableMetadata === false => +20 puan
+    if (!security.mutableMetadata) {
+      score += 20;
+    }
+    
+    // jupStrictList === true => +30 puan
+    if (security.jupStrictList) {
+      score += 30;
+    }
+    
+    // creatorBalance < 10 SOL => +10 puan
+    if (security.creatorBalance < 10) {
+      score += 10;
+    }
+    
+    return Math.min(score, 100); // Max 100 puan
+  }
+
   calculateWeightedScore(analysis: SecurityAnalysis): number {
     const weights = {
       liquidity: 0.3,
