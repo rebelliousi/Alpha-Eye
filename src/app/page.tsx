@@ -1,53 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, X as TwitterIcon, Globe } from 'lucide-react';
-
-interface EnrichedToken {
-  name: string;
-  symbol: string;
-  address: string;
-  liquidity: number;
-  logo: string;
-  securityScore: number;
-  twitter: string;
-  website: string;
-  telegram: string;
-}
+import { useTokens } from '@/hooks/useTokens';
 
 export default function Home() {
-  const [tokens, setTokens] = useState<EnrichedToken[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTokens = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/tokens');
-      const result = await response.json();
-      
-      console.log('Frontend API Response:', result);
-      console.log("FRONTEND_GET:", result);
-      
-      // Handle direct array response from API
-      const tokens = Array.isArray(result) ? result : [];
-      console.log("FRONTEND_FINAL:", tokens);
-      setTokens(tokens);
-    } catch {
-      setError('Network error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchTokens();
-    return () => controller.abort();
-  }, []);
+  const { data: tokens = [], isLoading, error, refetch } = useTokens();
 
   const formatLiquidity = (liquidity: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -64,7 +24,7 @@ export default function Home() {
     return 'bg-red-500';
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white p-6">
         <div className="max-w-7xl mx-auto">
@@ -90,9 +50,9 @@ export default function Home() {
           </div>
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
-              <div className="text-center text-red-400">Error: {error}</div>
+              <div className="text-center text-red-400">Error: {error.message}</div>
               <button 
-                onClick={fetchTokens}
+                onClick={() => refetch()}
                 className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Retry
@@ -110,7 +70,7 @@ export default function Home() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">AlphaEye | Pro-Grade Token Guard</h1>
           <button 
-            onClick={fetchTokens}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Refresh

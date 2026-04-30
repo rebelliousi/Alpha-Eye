@@ -1,87 +1,31 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { Token } from '@/types/token';
+import { useQuery } from '@tanstack/react-query';
 
-interface UseTokensOptions {
-  page?: number;
-  limit?: number;
-  sortBy?: 'liquidity' | 'securityScore' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
+interface EnrichedToken {
+  name: string;
+  symbol: string;
+  address: string;
+  liquidity: number;
+  logo: string;
+  securityScore: number;
+  twitter: string;
+  website: string;
+  telegram: string;
 }
 
-export function useTokens(options: UseTokensOptions = {}) {
-  const {
-    page = 1,
-    limit = 20,
-    sortBy = 'createdAt',
-    sortOrder = 'desc',
-  } = options;
-
+export function useTokens() {
   return useQuery({
-    queryKey: ['tokens', page, limit, sortBy, sortOrder],
+    queryKey: ['tokens'],
     queryFn: async () => {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-        sortBy,
-        sortOrder,
-      });
-
-      const response = await fetch(`/api/tokens?${params}`);
+      const response = await fetch('/api/tokens');
       if (!response.ok) {
         throw new Error('Failed to fetch tokens');
       }
 
-      return response.json() as Promise<{
-        data: Token[];
-        pagination: {
-          page: number;
-          limit: number;
-          total: number;
-          totalPages: number;
-        };
-      }>;
+      return response.json() as Promise<EnrichedToken[]>;
     },
-    staleTime: 30000, // 30 seconds
-    refetchInterval: 60000, // 1 minute
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    retry: 2,
   });
 }
 
-export function useInfiniteTokens(options: Omit<UseTokensOptions, 'page'> = {}) {
-  const { limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = options;
-
-  return useInfiniteQuery({
-    queryKey: ['tokens', 'infinite', limit, sortBy, sortOrder],
-    queryFn: async ({ pageParam = 1 }) => {
-      const params = new URLSearchParams({
-        page: pageParam.toString(),
-        limit: limit.toString(),
-        sortBy,
-        sortOrder,
-      });
-
-      const response = await fetch(`/api/tokens?${params}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch tokens');
-      }
-
-      return response.json() as Promise<{
-        data: Token[];
-        pagination: {
-          page: number;
-          limit: number;
-          total: number;
-          totalPages: number;
-        };
-      }>;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
-        return lastPage.pagination.page + 1;
-      }
-      return undefined;
-    },
-    staleTime: 30000,
-    refetchInterval: 60000,
-  });
-}
