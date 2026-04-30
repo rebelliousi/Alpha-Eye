@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Token {
+  id              String   @id @default(cuid())
+  address         String   @unique
+  symbol          String
+  name            String
+  liquidity       Float
+  liquidityAddedAt DateTime
+  securityScore   Int
+  riskLevel       RiskLevel
+  securityData    Json
+  metadata        Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  analyses        SecurityAnalysis[]
+  history         TokenHistory[]
+
+  @@map("tokens")
+}
+
+model SecurityAnalysis {
+  id              String   @id @default(cuid())
+  tokenId         String
+  score           Int
+  riskLevel       RiskLevel
+  details         Json
+  recommendations String[]
+  analyzedAt      DateTime @default(now())
+
+  token           Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("security_analyses")
+}
+
+model TokenHistory {
+  id            String   @id @default(cuid())
+  tokenId       String
+  liquidity     Float
+  securityScore Int
+  timestamp     DateTime @default(now())
+
+  token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("token_history")
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+}
