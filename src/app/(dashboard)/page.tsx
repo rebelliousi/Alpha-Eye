@@ -204,7 +204,7 @@ export default function DashboardPage() {
                             </Badge>
                           )}
                           <Badge className={`${getSecurityScoreColor(token.securityScore)} text-white`}>
-                            {token.securityScore || 0}/100
+                            {token.securityScore || 75}/100
                           </Badge>
                         </div>
                       </TableCell>

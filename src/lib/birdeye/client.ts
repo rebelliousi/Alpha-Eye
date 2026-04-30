@@ -15,8 +15,8 @@ export class RateLimitedClient {
   private readonly baseUrl: string;
   private readonly apiKey: string;
 
-  // 1 RPS (1 request per second)
-  private readonly MIN_INTERVAL = 1000;
+  // 1 RPS (1 request per second) - increased to 2 seconds for rate limit protection
+  private readonly MIN_INTERVAL = 2000;
   // 60 RPM (60 requests per minute)
   private readonly MAX_REQUESTS_PER_MINUTE = 60;
 

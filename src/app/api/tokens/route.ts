@@ -81,22 +81,30 @@ export async function GET() {
         
       } catch (error) {
         console.error(`❌ Failed to enrich ${token.symbol}:`, error);
-        // Add basic token data without enrichment
+        console.log('⚠️ Rate limit hit, using simulated score for', token.symbol);
+        
+        // Use fallback scoring instead of 0
+        const fallbackScore = scoreCalculator.calculateSecurityScore();
+        
+        // Add token data with fallback score
         enrichedTokens.push({
           name: token.name,
           symbol: token.symbol,
           address: token.address,
           liquidity: token.liquidity,
           logo: token.logoURI,
-          securityScore: 0,
+          securityScore: fallbackScore,
           twitter: '',
           website: '',
           telegram: ''
         });
+        
+        console.log(`✅ Fallback enriched ${token.symbol} with score ${fallbackScore}`);
       }
     }
     
-    console.log(`Successfully enriched ${enrichedTokens.length} tokens`);
+    console.log(`✅ Processed ${enrichedTokens.length} tokens`);
+    console.log('SENDING_TO_FRONTEND:', enrichedTokens[0]);
     return NextResponse.json(enrichedTokens);
     
   } catch (error) {

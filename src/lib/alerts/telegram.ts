@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+// Create dedicated axios instance for Telegram with proxy disabled
+const telegramClient = axios.create({
+  proxy: false
+});
+
 interface TelegramAlertData {
   symbol: string;
   name: string;
@@ -33,7 +38,7 @@ export async function sendTelegramAlert(data: TelegramAlertData): Promise<void> 
     `📊 DexScreener: https://dexscreener.com/solana/${data.address}`;
 
   try {
-    await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    await telegramClient.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       chat_id: chatId,
       text: message,
       parse_mode: 'Markdown',
@@ -52,5 +57,6 @@ export async function sendTelegramAlert(data: TelegramAlertData): Promise<void> 
     }
   } catch (error) {
     console.error('Failed to send Telegram alert:', error);
+    console.log('Telegram Error:', error.response?.data);
   }
 }
