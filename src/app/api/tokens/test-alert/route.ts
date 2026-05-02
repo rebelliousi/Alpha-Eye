@@ -3,7 +3,6 @@ import axios from 'axios';
 
 export async function POST(request: Request) {
   try {
-    // Body verisini alalım (Eğer frontend'den özel bir mesaj gelirse kullanmak için)
     let requestData;
     try {
       requestData = await request.json();
@@ -22,9 +21,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // --- PROFESYONEL SİNYAL FORMATI ---
-    // Not: Markdown v1 formatında özel karakterlerin önüne \ koymaya gerek yoktur, 
-    // ancak * ve _ gibi yapıları doğru kapatmak gerekir.
+   
     const signalMessage = `
 🚨 *ALPHAEYE SIGNAL DETECTED* 🚨
 ━━━━━━━━━━━━━━━━━━
@@ -60,7 +57,7 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log('✅ [TELEGRAM SIGNAL] Sinyal başarıyla gönderildi!');
+    console.log('✅ [TELEGRAM SIGNAL] Ssent succesfully!');
 
     return NextResponse.json({ 
       success: true, 
