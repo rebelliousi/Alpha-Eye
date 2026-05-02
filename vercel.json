@@ -1,0 +1,25 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "NEXTAUTH_URL": "@vercel-url"
+  },
+  "build": {
+    "env": {
+      "BIRDEYE_API_KEY": "@birdeye-api-key",
+      "TELEGRAM_BOT_TOKEN": "@telegram-bot-token",
+      "TELEGRAM_CHAT_ID": "@telegram-chat-id"
+    }
+  },
+  "functions": {
+    "src/app/api/tokens/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/tokens/test-alert/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}

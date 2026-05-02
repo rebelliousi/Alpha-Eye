@@ -1,0 +1,10 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/*
+
+# Host
+Host: https://alphaeye.vercel.app
+
+# Sitemaps
+Sitemap: https://alphaeye.vercel.app/sitemap.xml

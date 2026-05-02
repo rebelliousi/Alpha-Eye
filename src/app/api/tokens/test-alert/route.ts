@@ -3,33 +3,78 @@ import axios from 'axios';
 
 export async function POST(request: Request) {
   try {
-    const { message } = await request.json();
-    
+    // Body verisini alalım (Eğer frontend'den özel bir mesaj gelirse kullanmak için)
+    let requestData;
+    try {
+      requestData = await request.json();
+    } catch (e) {
+      requestData = { message: '' };
+    }
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
-    console.log('TELEGRAM_TEST: Bot Token exists:', !!botToken);
-    console.log('TELEGRAM_TEST: Chat ID exists:', !!chatId);
-    console.log('TELEGRAM_TEST: Bot Token length:', botToken?.length);
-    console.log('TELEGRAM_TEST: Chat ID:', chatId);
+    console.log('📡 [TELEGRAM SIGNAL] Profesyonel mesaj hazırlanıyor...');
 
     if (!botToken || !chatId) {
-      return NextResponse.json({ error: 'Telegram credentials not configured' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Telegram credentials not configured in .env.local' 
+      }, { status: 400 });
     }
 
-    await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      chat_id: chatId,
-      text: `🚨 AlphaEye Test Alert 🚨\n\n${message}`,
-      parse_mode: 'Markdown',
-      proxy: false
+    // --- PROFESYONEL SİNYAL FORMATI ---
+    // Not: Markdown v1 formatında özel karakterlerin önüne \ koymaya gerek yoktur, 
+    // ancak * ve _ gibi yapıları doğru kapatmak gerekir.
+    const signalMessage = `
+🚨 *ALPHAEYE SIGNAL DETECTED* 🚨
+━━━━━━━━━━━━━━━━━━
+💎 *Token:* $MJ (The Coach)
+🛡️ *Security Score:* 94/100
+💰 *Liquidity:* $2.45M
+✅ *Audit Status:* FULL AUDIT
+
+📊 *Quick Analysis:*
+• Top 10 Holders: 12% (Low Risk)
+• Metadata: Immutable ✅
+• Contract: Verified & Renounced ✅
+
+🔗 *Trade & Research:*
+• [DexScreener](https://dexscreener.com/solana/7xKXmP)
+• [Birdeye](https://birdeye.so/token/7xKXmP)
+━━━━━━━━━━━━━━━━━━
+👁️ _Powered by AlphaEye AI Sentinel_
+    `;
+
+    // Telegram API isteği
+    const response = await axios.post(
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
+      {
+        chat_id: chatId,
+        text: signalMessage,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false // Linklerin önizlemesi görünsün (şık durur)
+      },
+      {
+        proxy: false, 
+        timeout: 10000 
+      }
+    );
+
+    console.log('✅ [TELEGRAM SIGNAL] Sinyal başarıyla gönderildi!');
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Professional signal sent successfully'
     });
 
-    console.log('✅ Test alert sent to Telegram');
-    return NextResponse.json({ success: true, message: 'Test alert sent successfully' });
-    
-  } catch (error) {
-    console.error('Failed to send test alert:', error);
-    console.log('TELEGRAM_TEST_ERROR:', error.response?.data);
-    return NextResponse.json({ error: 'Failed to send test alert' }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ [TELEGRAM SIGNAL] HATASI:');
+
+    if (error.response) {
+      console.error('Detay:', JSON.stringify(error.response.data, null, 2));
+      return NextResponse.json({ error: 'Telegram API Error', details: error.response.data }, { status: error.response.status });
+    }
+
+    return NextResponse.json({ error: 'Network Error', message: error.message }, { status: 500 });
   }
 }
