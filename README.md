@@ -8,11 +8,18 @@
 
 ---
 
+## 🔗 Live Resources
+- **🌐 Live Dashboard**: [https://alpha-eye.vercel.app](https://alpha-eye.vercel.app)
+- **📱 Telegram Sentinel**: [t.me/alphaEyeAlertBot](https://t.me/alphaEyeAlertBot)
+- **💻 Repository**: Private (Access granted for Hackathon Judges)
+
+---
+
 ## 🌟 Vision
-AlphaEye was built for the **Birdeye Data Sprint** to bridge the gap between "detecting" a new listing and "verifying" its safety. While most bots just list names, AlphaEye performs a deep-dive security audit on every new pool using Birdeye's professional-grade API.
+AlphaEye was engineered for the **Birdeye Data Sprint** to solve the most critical problem in meme-coin trading: the gap between "detection" and "verification." While generic bots merely list names, AlphaEye performs an autonomous deep-dive security audit on every new pool using Birdeye's professional-grade data infrastructure.
 
 ### 📱 Live Telegram Intelligence
-Don't stare at a screen all day. AlphaEye's sentinel bot dispatches rich, formatted signals directly to your mobile.
+AlphaEye's sentinel bot dispatches rich, high-fidelity signals directly to your mobile. Every alert includes a weighted security score and instant research links.
 
 <p align="center">
   <img src="./public/screenshots/telegram-alert.jpg" width="450" alt="Telegram Alert Preview">
@@ -22,38 +29,38 @@ Don't stare at a screen all day. AlphaEye's sentinel bot dispatches rich, format
 
 ## 🚀 Key Features
 
-- **Real-time Discovery**: Scans Solana Mainnet every second for new listings via Birdeye V2.
-- **Deep Security Enrichment**: Automatically fetches holder concentration, contract status, and metadata mutability.
-- **Transparent Audit System**: Uses a "Tiered Analysis" approach. If API limits are reached, it honestly reports 'Partial Data' instead of guessing.
-- **Resilient Architecture**: Built-in 429 (Rate Limit) fallback ensures the dashboard never crashes.
-- **Premium HUD**: High-density trading terminal UI with Glassmorphism and Emerald-Glow effects.
+- **Real-time Discovery**: Scans Solana Mainnet every second for new listings via Birdeye V2 APIs.
+- **Deep Security Enrichment**: Automatically evaluates holder concentration, contract status, and metadata mutability.
+- **Transparent Audit System**: Employs a "Tiered Analysis" logic. If API constraints are met, it honestly reports `Partial Data` with a ⚠️ warning, ensuring 100% data integrity.
+- **Resilient Architecture**: Integrated 429 (Rate Limit) fallback mechanisms prevent dashboard crashes and handle high-traffic periods gracefully.
+- **Premium HUD**: High-density trading terminal UI featuring Glassmorphism, Emerald-Glow effects, and real-time state management.
 
 ---
 
 ## 🧠 Technical Depth & Architecture
 
-### 1. The "Sentinel" Engine
-AlphaEye doesn't just display data; it processes it through a weighted scoring algorithm:
-- **Liquidity Depth (40%)**: Minimum thresholds for tradeability.
-- **Holder Concentration (30%)**: Detects "whale" risks and developer-heavy distribution.
-- **Contract Integrity (20%)**: Verifies if the contract is renounced or mutable.
-- **Metadata Quality (10%)**: Checks for social presence and valid branding.
+### 1. The "Sentinel" Scoring Engine
+AlphaEye doesn't just show data; it quantifies risk through a weighted algorithm:
+- **Liquidity Depth (40%)**: Threshold analysis for tradeability.
+- **Holder Distribution (30%)**: Detecting whale risks and developer-heavy supply.
+- **Contract Integrity (20%)**: Verifying renounced ownership and mutability status.
+- **Metadata Quality (10%)**: Social verification and branding integrity.
 
-### 2. Bulletproof API Client
-To respect Birdeye's **1 RPS / 60 RPM** limit, we built a custom `RateLimitedClient`:
-- **Sequential Queue**: Processing 10 tokens takes exactly ~20 seconds to ensure 0% ban rate.
-- **Proxy Bypass**: Integrated `proxy: false` configurations to prevent SOCKS5/HTTP protocol mismatches in restricted network environments.
-- **Graceful Degradation**: When a 429 error is detected, the system switches to a "Liquidity-Only" score to keep the trader informed.
+### 2. Bulletproof API Strategy
+To respect Birdeye's **1 RPS / 60 RPM** constraints, we built a custom `RateLimitedClient`:
+- **Sequential Enrichment**: Processing occurs in a strictly controlled queue to maintain a 0% ban rate.
+- **Proxy Bypass**: Implemented `proxy: false` Axios configurations to handle restricted network environments and protocol mismatches.
+- **Graceful Degradation**: Intelligent catch-blocks switch to "Liquidity-Only" mode if the API returns a 429 error, keeping the user informed without data loss.
 
 ---
 
 ## 🛠️ Tech Stack
 - **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript (Strict Mode)
-- **Data Layer**: TanStack Query v5 (5-minute intelligent caching)
+- **State Management**: TanStack Query v5 (5-minute intelligent caching)
 - **Styling**: Tailwind CSS + Shadcn/ui (Custom Emerald Dark Theme)
 - **API**: Birdeye Data API (V2 Listings & V3 Metadata)
-- **Alerts**: Telegram Bot API + Axios Fetch
+- **Alerts**: Telegram Bot API (Fetch/Axios hybrid)
+- **Deployment**: Vercel (CI/CD)
 
 ---
 
@@ -72,12 +79,11 @@ To respect Birdeye's **1 RPS / 60 RPM** limit, we built a custom `RateLimitedCli
    npm install
 
 
----
 
-- **Live Demo**: [https://alphaeye-demo.vercel.app](https://alphaeye-demo.vercel.app) *(Henüz canlı değilse local olduğunu belirt)*
-- **Telegram Channel**: [Linkin]
-- **API Endpoints Used**:
-  - `/v2/tokens/new_listing` (Discovery)
-  - `/defi/token_security` (Audit)
-  - `/v1/token/meta` (Enrichment)
-- **Status**: Production Ready / Deployed (or Local MVP)
+
+I joined this Birdeye Data Sprint mid-way, which forced a hyper-focus on the most impactful features: robust security analysis, high-latency alert delivery, and a resilient architecture that handles API constraints with "Senior-level" grace. These 3 days were an intensive deep-dive into the Birdeye ecosystem.
+Status: ✅ Production Ready / Fully Deployed
+API Endpoints Utilized:
+GET /defi/v2/tokens/new_listing
+GET /defi/token_security
+GET /defi/v3/token/meta-data/single

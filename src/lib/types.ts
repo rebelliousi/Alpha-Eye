@@ -39,6 +39,10 @@ export interface Alert {
   status: 'sent' | 'pending' | 'failed'
   timeSent: string
   note: string
+  message: string
+  type: 'high_score' | 'new_listing'
+  timestamp: Date
+  read: boolean
 }
 
 export interface KPIData {
