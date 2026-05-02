@@ -4,9 +4,6 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "env": {
-    "NEXTAUTH_URL": "@vercel-url"
-  },
   "build": {
     "env": {
       "BIRDEYE_API_KEY": "@birdeye-api-key",
